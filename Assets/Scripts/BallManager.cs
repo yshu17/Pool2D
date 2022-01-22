@@ -5,12 +5,15 @@ using UnityEngine;
 public class BallManager : MonoBehaviour
 {
     Rigidbody2D rb;
+    float ballRad;
     public DrawTrajectory reflectTrajectory;
+
 
     public float stopSpeed = 0.8f, speed;
 
     private void Start() {
         rb = GetComponent<Rigidbody2D>();
+        ballRad= GetComponent<CircleCollider2D>().radius;
     }
     private void Update() {
      
@@ -18,15 +21,13 @@ public class BallManager : MonoBehaviour
         if (speed < stopSpeed) rb.velocity = Vector3.zero;
     }
     public void ShowRayc(RaycastHit2D hit)
-    {
-        Vector3 targetDir = (hit.transform.position - new Vector3(hit.centroid.x, hit.centroid.y, 0)).normalized * 500f;
-        
-        RaycastHit2D hit1 = Physics2D.Raycast(transform.position, targetDir, 500f, 1 << LayerMask.NameToLayer("Ball")|1 << LayerMask.NameToLayer("Ball"));
-        if (hit1)
+    {  
+        Vector2 targetDir = ((Vector2)hit.transform.position - new Vector2(hit.centroid.x, hit.centroid.y)).normalized * 100f;     
+        RaycastHit2D hit1 = Physics2D.CircleCast(hit.transform.position,ballRad, targetDir, 50f, 1 << LayerMask.NameToLayer("Table"));
+        if (hit1.collider != null)
         {
             Debug.DrawRay(transform.position,targetDir,Color.cyan);
-            reflectTrajectory.ShowTrajectory(hit1.point,targetDir);
-            
+            reflectTrajectory.ShowTrajectory(hit1.centroid,transform.position);
         }
         
     }
